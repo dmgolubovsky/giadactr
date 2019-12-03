@@ -3,7 +3,7 @@
 # Pull the base image and install the dependencies per the source package;
 # this is a good approximation of what is needed.
 
-from ubuntu:18.04 as base-ubuntu
+from ubuntu:19.04 as base-ubuntu
 
 run apt -y update && apt -y upgrade
 run cp /etc/apt/sources.list /etc/apt/sources.list~
@@ -19,7 +19,7 @@ run mkdir /build-giada
 workdir build-giada
 run git clone https://github.com/monocasual/giada.git
 workdir giada
-run git checkout v0.15.4
+run git checkout v0.16.0
 run git submodule init
 run git submodule update
 run autoreconf -i
@@ -51,6 +51,10 @@ run apt install -y libsndfile1 libfltk1.3 libxpm4 libjack0 libasound2 libpulse0
 run apt install -y libsamplerate0 librtmidi4 libjansson4
 
 copy --from=giada /usr/bin /usr/bin
+
+# Install few VSTs from distro
+
+run apt install -y iem-plugin-suite-vst carla-vst x42-plugins
 
 # Flatten image
 
