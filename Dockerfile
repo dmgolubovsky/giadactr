@@ -3,7 +3,7 @@
 # Pull the base image and install the dependencies per the source package;
 # this is a good approximation of what is needed.
 
-from ubuntu:19.04 as base-ubuntu
+from ubuntu:18.04 as base-ubuntu
 
 run apt -y update && apt -y upgrade
 run cp /etc/apt/sources.list /etc/apt/sources.list~
@@ -54,13 +54,29 @@ run echo "APT::Install-Recommends \"false\";" >> /etc/apt/apt.conf
 run echo "APT::Install-Suggests \"false\";" >> /etc/apt/apt.conf
 
 run apt-fast install -y libsndfile1 libfltk1.3 libxpm4 libjack0 libasound2 libpulse0
-run apt-fast install -y libsamplerate0 librtmidi4 libjansson4 iem-plugin-suite-vst
+run apt-fast install -y libsamplerate0 librtmidi4 libjansson4
 
 copy --from=giada /usr/bin /usr/bin
 
-# Install few VSTs from distro
+# Install kx-studio
 
-run apt install -y iem-plugin-suite-vst carla-vst x42-plugins
+workdir /install-kx
+
+# Install required dependencies if needed
+run apt-fast -y install apt-transport-https gpgv wget
+
+# Download package file
+run wget https://launchpad.net/~kxstudio-debian/+archive/kxstudio/+files/kxstudio-repos_10.0.3_all.deb
+
+# Install it
+run dpkg -i kxstudio-repos_10.0.3_all.deb
+
+run apt-fast -y update
+
+run apt-fast -y install kxstudio-meta-all \
+                        kxstudio-meta-audio-plugins kxstudio-meta-audio-plugins-collection
+
+run rm -rf /install-kx
 
 # Flatten image
 
